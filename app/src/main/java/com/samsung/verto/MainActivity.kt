@@ -4,13 +4,26 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.samsung.verto.presentation.AppViewModelFactory
+import com.samsung.verto.presentation.auth.AuthViewModel
+import com.samsung.verto.presentation.main.MainViewModel
+import com.samsung.verto.presentation.screens.AuthScreen
+import com.samsung.verto.presentation.screens.DashboardScreen
 import com.samsung.verto.ui.theme.VertoTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +32,34 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VertoTheme {
+                val container = remember { AppContainer() }
+                val factory = remember { AppViewModelFactory(container.useCases, container.session) }
+                val authViewModel: AuthViewModel = viewModel(factory = factory)
+                val mainViewModel: MainViewModel = viewModel(factory = factory)
+                val authState by authViewModel.uiState.collectAsState()
+
+                val isAuthenticated = authState.isAuthenticated
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    AnimatedContent(
+                        targetState = isAuthenticated,
+                        transitionSpec = {
+                            fadeIn() + slideInVertically { it / 8 } togetherWith
+                                fadeOut() + slideOutVertically { it / 8 }
+                        },
+                        label = "auth-switch",
+                        modifier = Modifier.padding(innerPadding),
+                    ) { authed ->
+                        if (authed) {
+                            LaunchedEffect(Unit) {
+                                mainViewModel.loadInitial()
+                            }
+                            DashboardScreen(mainViewModel)
+                        } else {
+                            AuthScreen(authViewModel)
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VertoTheme {
-        Greeting("Android")
     }
 }

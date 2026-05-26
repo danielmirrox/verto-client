@@ -1,3 +1,50 @@
 <resources>
     <string name="app_name">Verto</string>
+    <string name="app_title">Verto Pulse</string>
+
+    <string name="auth_subtitle">Мгновенный демо-кошелек для быстрых переводов</string>
+    <string name="auth_title">Вход</string>
+    <string name="label_email">Эл. почта</string>
+    <string name="error_email_invalid">Введите корректный email</string>
+    <string name="helper_email_demo">Демо: user@verto.app</string>
+    <string name="label_display_name">Отображаемое имя</string>
+    <string name="helper_optional">Необязательно</string>
+    <string name="label_firebase_token">Токен Firebase (заглушка)</string>
+    <string name="error_token_required">Нужен токен</string>
+    <string name="helper_token_demo">В демо подойдет любое непустое значение</string>
+    <string name="action_sign_in">Войти</string>
+    <string name="action_sign_in_loading">Входим...</string>
+    <string name="error_auth_failed">Не удалось войти</string>
+
+    <string name="title_wallet">Кошелек</string>
+    <string name="label_available">Доступно</string>
+    <string name="placeholder_balance">--</string>
+    <string name="status_syncing">Синхронизация...</string>
+    <string name="section_topup">Пополнение</string>
+    <string name="label_amount">Сумма</string>
+    <string name="error_amount_positive">Введите положительную сумму</string>
+    <string name="helper_minimum_one">Минимум 1</string>
+    <string name="action_topup">Пополнить</string>
+    <string name="section_transfer">Перевод</string>
+    <string name="label_recipient_id">ID получателя</string>
+    <string name="error_user_id_numeric">Введите числовой ID</string>
+    <string name="helper_user_id_from_search">Берите ID из результатов поиска</string>
+    <string name="action_send">Отправить</string>
+    <string name="section_search_users">Поиск пользователей</string>
+    <string name="label_query">Запрос</string>
+    <string name="action_search">Найти</string>
+    <string name="helper_search_min_chars">Введите минимум 2 символа</string>
+    <string name="helper_search_empty">Ничего не найдено</string>
+    <string name="section_transactions">Операции</string>
+    <string name="filter_all">Все</string>
+    <string name="filter_topups">Пополнения</string>
+    <string name="filter_transfers">Переводы</string>
+    <string name="empty_transactions">Операций пока нет</string>
+    <string name="transaction_label_topup">Пополнение</string>
+    <string name="transaction_label_transfer">Перевод</string>
+    <string name="transaction_participants">от=%1$s к=%2$s</string>
+    <string name="user_row">%1$s: %2$s</string>
+    <string name="placeholder_dash">-</string>
+    <string name="error_load_failed">Не удалось загрузить данные</string>
+    <string name="error_request_failed">Произошла ошибка</string>
 </resources>
