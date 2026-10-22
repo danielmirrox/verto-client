@@ -17,7 +17,7 @@ class FakePaymentRepository : PaymentRepository {
     var transactions: List<Transaction> = emptyList()
     var searchResults: List<User> = listOf(user)
 
-    override suspend fun auth(firebaseToken: String, email: String, displayName: String?): AuthResult = authResult
+    override suspend fun auth(password: String, email: String, displayName: String?, register: Boolean): AuthResult = authResult
 
     override suspend fun getUser(): User = user
 

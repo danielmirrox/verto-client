@@ -15,8 +15,8 @@ class PaymentRepositoryImpl(
     private val apiClient: ApiClient,
     private val sessionStore: SessionStore,
 ) : PaymentRepository {
-    override suspend fun auth(firebaseToken: String, email: String, displayName: String?): AuthResult {
-        val response = apiClient.auth(AuthRequestDto(firebaseToken, email, displayName))
+    override suspend fun auth(password: String, email: String, displayName: String?, register: Boolean): AuthResult {
+        val response = apiClient.auth(AuthRequestDto(password, email, displayName, register))
         sessionStore.accessToken = response.accessToken
         val user = apiClient.getUser()
         return AuthResult(

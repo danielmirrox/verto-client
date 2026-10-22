@@ -11,6 +11,7 @@ composeBom = "2026.02.01"
 coroutines = "1.10.2"
 ktor = "3.4.2"
 serializationJson = "1.7.3"
+coroutinesPlayServices = "1.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

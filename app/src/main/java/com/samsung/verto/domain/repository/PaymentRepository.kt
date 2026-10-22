@@ -6,7 +6,7 @@ import com.samsung.verto.domain.model.Transaction
 import com.samsung.verto.domain.model.User
 
 interface PaymentRepository {
-    suspend fun auth(firebaseToken: String, email: String, displayName: String?): AuthResult
+    suspend fun auth(password: String, email: String, displayName: String?, register: Boolean): AuthResult
     suspend fun getUser(): User
     suspend fun getBalance(): Balance
     suspend fun topup(amount: Long): Transaction

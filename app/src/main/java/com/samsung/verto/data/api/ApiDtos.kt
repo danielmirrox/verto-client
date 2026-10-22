@@ -4,9 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AuthRequestDto(
-    val firebaseToken: String,
+    val password: String,
     val email: String? = null,
     val displayName: String? = null,
+    val register: Boolean = false,
 )
 
 @Serializable

@@ -13,8 +13,8 @@ class UseCases(repository: PaymentRepository) {
 }
 
 class AuthUseCase(private val repository: PaymentRepository) {
-    suspend operator fun invoke(firebaseToken: String, email: String, displayName: String?) =
-        repository.auth(firebaseToken, email, displayName)
+    suspend operator fun invoke(password: String, email: String, displayName: String?, register: Boolean = false) =
+        repository.auth(password, email, displayName, register)
 }
 
 class GetUserUseCase(private val repository: PaymentRepository) {

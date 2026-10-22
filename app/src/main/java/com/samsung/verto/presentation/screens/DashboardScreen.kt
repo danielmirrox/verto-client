@@ -6,6 +6,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,8 +55,12 @@ import com.samsung.verto.ui.theme.PulseGradientEnd
 import com.samsung.verto.ui.theme.PulseGradientStart
 
 @Composable
-fun DashboardScreen(viewModel: MainViewModel) {
+fun DashboardScreen(viewModel: MainViewModel, darkTheme: Boolean = false, onThemeChange: (Boolean) -> Unit = {}, onLogout: () -> Unit = {}) {
+    val keyboard = LocalSoftwareKeyboardController.current
+    val focus = LocalFocusManager.current
+    var searchFocused by remember { mutableStateOf(false) }
     val state by viewModel.uiState.collectAsState()
+    val readableAccent = if (MaterialTheme.colorScheme.background == com.samsung.verto.ui.theme.PulseFog) androidx.compose.ui.graphics.Color(0xFF3D6500) else MaterialTheme.colorScheme.primary
     val topupAmount = state.topupAmount.toLongOrNull()
     val topupValid = topupAmount != null && topupAmount > 0
     val showTopupError = state.topupAmount.isNotBlank() && !topupValid
@@ -65,13 +79,18 @@ fun DashboardScreen(viewModel: MainViewModel) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(PulseGradientStart, PulseGradientEnd)
+                    colors = listOf(MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.surfaceVariant)
                 )
             )
             .padding(16.dp)
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Тёмная тема")
+                    Switch(checked = darkTheme, onCheckedChange = onThemeChange)
+                    TextButton(colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = readableAccent), onClick = onLogout) { Text("Выйти") }
+                }
                 Text(text = stringResource(R.string.title_wallet), style = MaterialTheme.typography.titleLarge)
                 state.user?.let { user ->
                     Text(text = user.email, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -93,6 +112,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                                 text = errorText.orEmpty(),
                                 color = MaterialTheme.colorScheme.onError,
                             )
+                            TextButton(colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = readableAccent), onClick = viewModel::refresh) { Text("Повторить") }
                         }
                     }
                 }
@@ -136,6 +156,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                         Text(text = stringResource(R.string.section_topup), style = MaterialTheme.typography.titleMedium)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedTextField(
+                                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(focusedBorderColor = readableAccent, focusedLabelColor = readableAccent, cursorColor = readableAccent),
                                 value = state.topupAmount,
                                 onValueChange = viewModel::updateTopupAmount,
                                 label = { Text(stringResource(R.string.label_amount)) },
@@ -150,7 +171,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                                     }
                                 },
                             )
-                            Button(onClick = viewModel::topup, enabled = topupValid) {
+                            Button(onClick = viewModel::topup, enabled = topupValid && !state.isSubmitting) {
                                 Icon(imageVector = Icons.Rounded.Add, contentDescription = null)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(stringResource(R.string.action_topup))
@@ -171,6 +192,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                     ) {
                         Text(text = stringResource(R.string.section_transfer), style = MaterialTheme.typography.titleMedium)
                         OutlinedTextField(
+                                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(focusedBorderColor = readableAccent, focusedLabelColor = readableAccent, cursorColor = readableAccent),
                             value = state.transferUserId,
                             onValueChange = viewModel::updateTransferUserId,
                             label = { Text(stringResource(R.string.label_recipient_id)) },
@@ -187,6 +209,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedTextField(
+                                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(focusedBorderColor = readableAccent, focusedLabelColor = readableAccent, cursorColor = readableAccent),
                                 value = state.transferAmount,
                                 onValueChange = viewModel::updateTransferAmount,
                                 label = { Text(stringResource(R.string.label_amount)) },
@@ -201,7 +224,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                                     }
                                 },
                             )
-                            Button(onClick = viewModel::transfer, enabled = transferValid) {
+                            Button(onClick = viewModel::transfer, enabled = transferValid && !state.isSubmitting) {
                                 Icon(imageVector = Icons.AutoMirrored.Rounded.Send, contentDescription = null)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(stringResource(R.string.action_send))
@@ -223,13 +246,16 @@ fun DashboardScreen(viewModel: MainViewModel) {
                         Text(text = stringResource(R.string.section_search_users), style = MaterialTheme.typography.titleMedium)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedTextField(
+                                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(focusedBorderColor = readableAccent, focusedLabelColor = readableAccent, cursorColor = readableAccent),
                                 value = state.searchQuery,
                                 onValueChange = viewModel::updateSearchQuery,
                                 label = { Text(stringResource(R.string.label_query)) },
-                                modifier = Modifier.weight(1f),
+                                placeholder = { Text("Email получателя") },
+                                trailingIcon = { if (state.searchQuery.isNotEmpty()) TextButton(colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = readableAccent), onClick = { viewModel.clearSearch(); keyboard?.hide(); focus.clearFocus() }) { Text("Очистить") } },
+                                modifier = Modifier.weight(1f).onFocusChanged { searchFocused = it.isFocused },
                                 singleLine = true,
                             )
-                            Button(onClick = viewModel::search) {
+                            Button(onClick = { keyboard?.hide(); viewModel.search() }, enabled = hasSearchQuery && !state.searchLoading) {
                                 Icon(imageVector = Icons.Rounded.Search, contentDescription = null)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(stringResource(R.string.action_search))
@@ -242,7 +268,19 @@ fun DashboardScreen(viewModel: MainViewModel) {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
-                        if (hasSearchQuery && state.searchResults.isEmpty()) {
+                        if (searchFocused && state.recipientHistory.isNotEmpty()) {
+                            Text("Недавние получатели")
+                            state.recipientHistory.forEach { user ->
+                                Text(user.email, modifier = Modifier.fillMaxWidth().clickable { viewModel.selectRecipient(user); keyboard?.hide(); focus.clearFocus() }.padding(8.dp))
+                            }
+                            TextButton(colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = readableAccent), onClick = viewModel::clearHistory) { Text("Очистить историю") }
+                        }
+                        if (state.searchLoading) CircularProgressIndicator()
+                        state.searchError?.let { message ->
+                            Text(message, color = MaterialTheme.colorScheme.error)
+                            TextButton(colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = readableAccent), onClick = viewModel::search) { Text("Обновить") }
+                        }
+                        if (state.searchCompleted && state.searchResults.isEmpty()) {
                             Text(
                                 text = stringResource(R.string.helper_search_empty),
                                 style = MaterialTheme.typography.bodySmall,
@@ -250,7 +288,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                             )
                         } else {
                             state.searchResults.forEach { user ->
-                                Text(text = stringResource(R.string.user_row, user.id, user.email))
+                                Text(text = stringResource(R.string.user_row, user.id, user.email), modifier = Modifier.fillMaxWidth().clickable { viewModel.selectRecipient(user); keyboard?.hide(); focus.clearFocus() }.padding(8.dp))
                             }
                         }
                     }

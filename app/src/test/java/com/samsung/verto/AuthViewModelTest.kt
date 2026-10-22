@@ -23,7 +23,7 @@ class AuthViewModelTest {
         val viewModel = AuthViewModel(useCases, session)
 
         viewModel.updateEmail("demo@example.com")
-        viewModel.updateToken("dev-token")
+        viewModel.updatePassword("dev-password")
         viewModel.login()
         advanceUntilIdle()
 

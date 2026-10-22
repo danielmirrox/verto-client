@@ -10,6 +10,7 @@ import com.samsung.verto.presentation.main.MainViewModel
 class AppViewModelFactory(
     private val useCases: UseCases,
     private val sessionStore: SessionStore,
+    private val history: com.samsung.verto.data.local.RecipientHistory,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -18,7 +19,7 @@ class AppViewModelFactory(
                 AuthViewModel(useCases, sessionStore) as T
             }
             modelClass.isAssignableFrom(MainViewModel::class.java) -> {
-                MainViewModel(useCases, sessionStore) as T
+                MainViewModel(useCases, sessionStore, history) as T
             }
             else -> throw IllegalArgumentException("Неизвестный класс ViewModel")
         }

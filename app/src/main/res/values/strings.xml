@@ -9,9 +9,10 @@
     <string name="helper_email_demo">Демо: user@verto.app</string>
     <string name="label_display_name">Отображаемое имя</string>
     <string name="helper_optional">Необязательно</string>
-    <string name="label_firebase_token">Токен Firebase (заглушка)</string>
-    <string name="error_token_required">Нужен токен</string>
-    <string name="helper_token_demo">В демо подойдет любое непустое значение</string>
+    <string name="label_password">Пароль</string>
+    <string name="error_password_required">Введите пароль</string>
+    <string name="helper_password_demo">От 8 до 128 символов</string>
+    <string name="error_firebase_auth_failed">Не удалось войти</string>
     <string name="action_sign_in">Войти</string>
     <string name="action_sign_in_loading">Входим...</string>
     <string name="error_auth_failed">Не удалось войти</string>

@@ -14,9 +14,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.samsung.verto.data.local.PreferencesRecipientHistory
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.samsung.verto.presentation.AppViewModelFactory
@@ -31,9 +37,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            VertoTheme {
+            var darkTheme by rememberSaveable { mutableStateOf(false) }
+            SideEffect {
+                WindowInsetsControllerCompat(window, window.decorView).apply {
+                    isAppearanceLightStatusBars = !darkTheme
+                    isAppearanceLightNavigationBars = !darkTheme
+                }
+            }
+            VertoTheme(darkTheme = darkTheme) {
                 val container = remember { AppContainer() }
-                val factory = remember { AppViewModelFactory(container.useCases, container.session) }
+                val factory = remember { AppViewModelFactory(container.useCases, container.session, PreferencesRecipientHistory(applicationContext)) }
                 val authViewModel: AuthViewModel = viewModel(factory = factory)
                 val mainViewModel: MainViewModel = viewModel(factory = factory)
                 val authState by authViewModel.uiState.collectAsState()
@@ -53,7 +66,7 @@ class MainActivity : ComponentActivity() {
                             LaunchedEffect(Unit) {
                                 mainViewModel.loadInitial()
                             }
-                            DashboardScreen(mainViewModel)
+                            DashboardScreen(mainViewModel, darkTheme, { darkTheme = it }, { mainViewModel.reset(); authViewModel.logout() })
                         } else {
                             AuthScreen(authViewModel)
                         }
